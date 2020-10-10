@@ -12,14 +12,13 @@ import java.util.TimerTask;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-
 public class Servidor {
 	
 	    public static void main(String[] args) throws IOException {
 	        
 	    	ServerSocket servidor = new ServerSocket(8080); 
 	    	System.out.println("Aguardando conexão!");
-	        Socket socket = servidor.accept();
+	    	 Socket socket = servidor.accept();
 	        
 	        System.out.println("Server Conectado");
 	        BufferedReader br = new BufferedReader(new InputStreamReader(socket.getInputStream()));
@@ -37,12 +36,13 @@ public class Servidor {
 	                    Pattern regex = Pattern.compile("(([a-zA-Z]*[0-9]*[_]+)|([a-zA-Z]*[0-9]*[:])|([a-zA-Z]*[0-9]*))$");
 	                    
 	            			Matcher matcher = regex.matcher(msg);
-	            			
+	            			String resposta = null ;
 	            			while (matcher.find()) {
-	            				String resposta = matcher.group(0);	
-	            				out.println(resposta+" ATIVADO 30");
+	            				resposta= matcher.group(0);	
 	            				break;
-	            			}	
+	            			}
+	            			
+	            			out.println(resposta+" ATIVADO 30");
 	            			
             				Timer timer = new Timer();
     	            		
