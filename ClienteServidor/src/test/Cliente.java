@@ -5,6 +5,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintStream;
+import java.lang.Thread.State;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
@@ -14,12 +15,12 @@ import java.util.regex.Pattern;
 public class Cliente {
 	private static Socket s;
 	private static BufferedReader br;
-	private static PrintStream out;
+	public static PrintStream out;
 	public static boolean estadoCaminhao = true;
 	private static List<Parser> lista = new ArrayList<Parser>();
 	private static Parser p = new Parser();
-	private static int idCaminhao = 4;
-
+	public static int idCaminhao = 4;
+	
 	public static void main(String[] args) {
 
 		central(estadoCaminhao);
@@ -36,19 +37,96 @@ public class Cliente {
 		System.out.println("Cliente conectado!");
 	}
 
+	
 	public static void enviarComando(String msg, int idCaminhao) throws IOException {
-
+        
 		out.println(msg + " " + idCaminhao);
 
 		while (true) {
 			msg = br.readLine();
-			System.out.println(msg);
+			System.out.println(s.getInetAddress()+" "+msg);
 
 			if (msg.contains("COLETAR")) {
-				coletar(msg, idCaminhao);
-				break;
+			    
+				estadoCaminhao=false;
+				Thread cheguei = new Thread(new Runnable() {
+		            @Override
+		            public void run() {
+		            
+		            	// TODO Auto-generated method stub
+		        		int tempo = 0;
+		        		while(tempo<5||tempo>20) {
+		        		tempo =(int) (Math.random()* 20);
+		        		}
+		        		System.out.println("Tempo para chegar "+tempo);
+		        		try {
+		        			Thread.sleep(tempo*1000);
+		        		} catch (InterruptedException e) {
+		        			// TODO Auto-generated catch block
+		        			e.printStackTrace();
+		        		}
+		        		out.println("CHEGUEI_CONTAINER"+" "+ idCaminhao);
+		            }        
+		        });
+				
+				Thread coletar = new Thread(new Runnable() {
+		            @Override
+		            public void run() {
+		            
+		            	try {
+							cheguei.join();
+						} catch (InterruptedException e1) {
+							// TODO Auto-generated catch block
+							e1.printStackTrace();
+						}
+		            	// TODO Auto-generated method stub
+		        		int tempo = 0;
+		        		while(tempo<5||tempo>20) {
+		        		tempo =(int) (Math.random()* 20);
+		        		}
+		        		System.out.println("Tempo para coletar "+tempo);
+		        		try {
+		        			Thread.sleep(tempo*1000);
+		        		} catch (InterruptedException e) {
+		        			// TODO Auto-generated catch block
+		        			e.printStackTrace();
+		        		}
+		        		out.println("COLETA_FINALIZADA"+" "+ idCaminhao);
+		        		
+		            }        
+		        });
+				
+			    Thread livre = new Thread(new Runnable() {
+		            @Override
+		            public void run() {
+		            
+		            	try {
+							coletar.join();
+						} catch (InterruptedException e1) {
+							// TODO Auto-generated catch block
+							e1.printStackTrace();
+						}
+		            	// TODO Auto-generated method stub
+		        		int tempo = 5;
+		        		try {
+		        			Thread.sleep(tempo*1000);
+		        		} catch (InterruptedException e) {
+		        			// TODO Auto-generated catch block
+		        			e.printStackTrace();
+		        		}
+		        		out.println("LIVRE "+ idCaminhao);
+		        		
+		            }        
+		        });
+			    	
+			    cheguei.start();
+				coletar.start();
+				livre.start();
+			
 			}
+			
 		}
+	
 	}
 
 	public static void coletar(String msg, int idCaminhao) throws IOException {
@@ -61,11 +139,8 @@ public class Cliente {
 		while (matcher.find()) {
 			idContainer = matcher.group(0);
 		}
-
-		enviarComando("CHEGUEI_CONTAINER", idCaminhao);
-
-		enviarComando("COLETA_FINALIZADA", idCaminhao);
-
+		
+       
 	}
 
 	public static void central(boolean estadoCaminhao) {

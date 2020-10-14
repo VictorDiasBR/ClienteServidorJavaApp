@@ -7,6 +7,7 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.Date;
 import java.util.Random;
+import java.util.Scanner;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.regex.Matcher;
@@ -24,39 +25,20 @@ public class Servidor {
 	        BufferedReader br = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 	        PrintStream out = new PrintStream(socket.getOutputStream());
 	       
+	        Scanner sc = new Scanner(System.in);
 	            while (true) {
 	            	
 	                    String msg = br.readLine();
 	                    
-	                    System.out.println(socket.getPort()+": "+msg);
+	                    System.out.println(socket.getRemoteSocketAddress()+": "+msg);
 	                    
 	                    if(msg.equals("close")) {
 	                    	break;
+	                    }else if(msg.contains("LIVRE")) {
+	                    	out.println("COLETAR 1");
 	                    }
-	                    Pattern regex = Pattern.compile("(([a-zA-Z]*[0-9]*[_]+)|([a-zA-Z]*[0-9]*[:])|([a-zA-Z]*[0-9]*))$");
 	                    
-	            			Matcher matcher = regex.matcher(msg);
-	            			String resposta = null ;
-	            			while (matcher.find()) {
-	            				resposta= matcher.group(0);	
-	            				break;
-	            			}
-	            			
-	            			out.println(resposta+" ATIVADO 30");
-	            			
-            				Timer timer = new Timer();
-    	            		
-	            			TimerTask tt = new TimerTask() {
-
-								@Override
-								public void run() {
-									int x = (int) (Math.random() * 1000);
-									System.out.println(x);
-									out.println(x+" cº");
-								}
-	            				
-	            			};
-	            			timer.scheduleAtFixedRate(tt, 5,22000); 
+	            			out.flush();
 	                 
 	            		}
 	                  
