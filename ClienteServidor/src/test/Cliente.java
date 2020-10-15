@@ -19,8 +19,8 @@ public class Cliente {
 	public static boolean estadoCaminhao = true;
 	private static List<Parser> lista = new ArrayList<Parser>();
 	private static Parser p = new Parser();
-	public static int idCaminhao = 4;
-	
+	public static int idCaminhao = 5;
+
 	public static void main(String[] args) {
 
 		central(estadoCaminhao);
@@ -37,110 +37,73 @@ public class Cliente {
 		System.out.println("Cliente conectado!");
 	}
 
-	
 	public static void enviarComando(String msg, int idCaminhao) throws IOException {
-        
+
 		out.println(msg + " " + idCaminhao);
 
 		while (true) {
 			msg = br.readLine();
-			System.out.println(s.getInetAddress()+" "+msg);
+			System.out.println(s.getInetAddress() + " " + msg);
 
 			if (msg.contains("COLETAR")) {
-			    
-				estadoCaminhao=false;
+
+				estadoCaminhao = false;
 				Thread cheguei = new Thread(new Runnable() {
-		            @Override
-		            public void run() {
-		            
-		            	// TODO Auto-generated method stub
-		        		int tempo = 0;
-		        		while(tempo<5||tempo>20) {
-		        		tempo =(int) (Math.random()* 20);
-		        		}
-		        		System.out.println("Tempo para chegar "+tempo);
-		        		try {
-		        			Thread.sleep(tempo*1000);
-		        		} catch (InterruptedException e) {
-		        			// TODO Auto-generated catch block
-		        			e.printStackTrace();
-		        		}
-		        		out.println("CHEGUEI_CONTAINER"+" "+ idCaminhao);
-		            }        
-		        });
-				
+					@Override
+					public void run() {
+
+						// TODO Auto-generated method stub
+						int tempo = 0;
+						while (tempo < 5 || tempo > 20) {
+							tempo = (int) (Math.random() * 20);
+						}
+						System.out.println("Tempo para chegar " + tempo+ " s");
+						try {
+							Thread.sleep(tempo * 1000);
+						} catch (InterruptedException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+						out.println("CHEGUEI_CONTAINER" + " " + idCaminhao);
+						System.out.println("Cheguei Container enviado");
+					}
+				});
+
 				Thread coletar = new Thread(new Runnable() {
-		            @Override
-		            public void run() {
-		            
-		            	try {
+					@Override
+					public void run() {
+
+						try {
 							cheguei.join();
 						} catch (InterruptedException e1) {
 							// TODO Auto-generated catch block
 							e1.printStackTrace();
 						}
-		            	// TODO Auto-generated method stub
-		        		int tempo = 0;
-		        		while(tempo<5||tempo>20) {
-		        		tempo =(int) (Math.random()* 20);
-		        		}
-		        		System.out.println("Tempo para coletar "+tempo);
-		        		try {
-		        			Thread.sleep(tempo*1000);
-		        		} catch (InterruptedException e) {
-		        			// TODO Auto-generated catch block
-		        			e.printStackTrace();
-		        		}
-		        		out.println("COLETA_FINALIZADA"+" "+ idCaminhao);
-		        		
-		            }        
-		        });
-				
-			    Thread livre = new Thread(new Runnable() {
-		            @Override
-		            public void run() {
-		            
-		            	try {
-							coletar.join();
-						} catch (InterruptedException e1) {
-							// TODO Auto-generated catch block
-							e1.printStackTrace();
+						// TODO Auto-generated method stub
+						int tempo = 0;
+						while (tempo < 5 || tempo > 20) {
+							tempo = (int) (Math.random() * 20);
 						}
-		            	// TODO Auto-generated method stub
-		        		int tempo = 5;
-		        		try {
-		        			Thread.sleep(tempo*1000);
-		        		} catch (InterruptedException e) {
-		        			// TODO Auto-generated catch block
-		        			e.printStackTrace();
-		        		}
-		        		out.println("LIVRE "+ idCaminhao);
-		        		
-		            }        
-		        });
-			    	
-			    cheguei.start();
+						System.out.println("Tempo para coletar " + tempo+ " s");
+						try {
+							Thread.sleep(tempo * 1000);
+						} catch (InterruptedException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+						out.println("COLETA_FINALIZADA" + " " + idCaminhao);
+						System.out.println("Coleta Finalizada enviado");
+					}
+				});
+
+				cheguei.start();
 				coletar.start();
-				livre.start();
-			
-			}
-			
-		}
-	
-	}
-
-	public static void coletar(String msg, int idCaminhao) throws IOException {
-
-		estadoCaminhao = false;
-		Pattern regex = Pattern.compile("[0-9]+");
-
-		Matcher matcher = regex.matcher(msg);
-		String idContainer = null;
-		while (matcher.find()) {
-			idContainer = matcher.group(0);
-		}
 		
-       
+				estadoCaminhao=true;
+			}
+
+		}
+
 	}
 
 	public static void central(boolean estadoCaminhao) {
@@ -165,13 +128,14 @@ public class Cliente {
 
 				try {
 					enviarComando("LIVRE", idCaminhao);
+					idCaminhao++;
 				} catch (IOException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
 
 			}
-		}else {
+		} else {
 			try {
 				enviarComando("OCUPADO", idCaminhao);
 			} catch (IOException e) {
