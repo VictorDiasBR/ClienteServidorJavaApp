@@ -19,7 +19,7 @@ public class Cliente {
 	public static boolean estadoCaminhao = true;
 	private static List<Parser> lista = new ArrayList<Parser>();
 	private static Parser p = new Parser();
-	public static int idCaminhao = 5;
+	public static int idCaminhao = 4;
 
 	public static void main(String[] args) {
 
